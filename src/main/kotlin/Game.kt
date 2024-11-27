@@ -7,23 +7,11 @@ import pt.isel.canvas.*
  * parameter is the pixel size
  */
 
-data class Cells(val grid: Vector2, val size: Int) {
-    fun normalize() = grid.div(2).times(size).times(2)
-    fun center() = normalize().div(2)
-    fun createWindow() = Canvas(normalize().x,normalize().y,BLACK)
-}
-
-data class Game(val snake: Snake, val screen: Canvas) {
+data class Game(val snake: Snake, val wall: Walls, val screen: Canvas) {
     fun draw() {
-
-        onStart {
-
-            snake.draw()
-        }
-
-        onFinish {
-
-        }
+        screen.erase()
+        snake.draw()
+        wall.draw()
     }
 }
 
