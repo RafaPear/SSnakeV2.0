@@ -44,7 +44,7 @@ fun main() {
         }
 
         screen.onTimeProgress(5000){
-            // game = Game(game.snake,game.wall.newWall(game.snake),screen)
+            game = Game(game.snake,game.wall.newWall(game.snake),screen)
 
         }
     }
