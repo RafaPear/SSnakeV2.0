@@ -8,10 +8,16 @@ import pt.isel.canvas.*
  */
 
 data class Game(val snake: Snake, val wall: Walls, val screen: Canvas) {
-    fun draw() {
+    fun run() {
         screen.erase()
         snake.draw()
         wall.draw()
+        debug()
+    }
+
+    fun debug(){
+        for (i in 0..<snake.totalPos(0).size)
+                screen.drawRect(snake.totalPos(0)[i].x,snake.totalPos(0)[i].y,CELLS.size,CELLS.size,WHITE,2)
     }
 }
 
