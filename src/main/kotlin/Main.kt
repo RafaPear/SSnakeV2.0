@@ -1,53 +1,96 @@
 import pt.isel.canvas.*
 
-
 val CELLS = Cells(Vector2(20,16),32)
-
-val body = listOf<SnakePart>(
-    SnakePart(Vector2(10,7).times(CELLS.size),Direction.UP),
-    SnakePart(Vector2(10,8).times(CELLS.size),Direction.UP)
-)
-
-var ateApple = false
+const val scoreAmount: Int = 1
+const val growAmount: Int = 5
 
 
 fun main() {
     onStart {
-        val screen = Canvas(CELLS.normalize.x,CELLS.normalize.y,BLACK)
-        var game = Game(
-            Snake(body, screen),
-            Walls(emptyList(), CELLS.emptyCells(), screen),
-            screen)
+        val screen = CELLS.createWindow()
 
-        screen.onTimeProgress(50){
-            game = Game(snake,game.wall.newWall(),screen)
-        }
 
-        screen.onTimeProgress(250){
-            var canPress = true
-            screen.onKeyPressed { keyEvent ->
-                game = when (keyEvent.code) {
-                    UP_CODE -> Game(game.snake.setDirection(Direction.UP), game.wall, screen)
-                    DOWN_CODE -> Game(game.snake.setDirection(Direction.DOWN), game.wall, screen)
-                    LEFT_CODE -> Game(game.snake.setDirection(Direction.LEFT), game.wall, screen)
-                    RIGHT_CODE -> Game(game.snake.setDirection(Direction.RIGHT), game.wall, screen)
-                    else -> game
+        screen.drawRect(Vector2(0, 0), CELLS.normalize * 2)
+        screen.drawText(CELLS.center - Vector2(CELLS.size * 3, -CELLS.size), "Loading...", BLACK, 50)
+        loadSounds("LevelUp", "Music1", "button1", "button2")
+
+        var game: Game = initGame(screen, 0, true).addApple()
+
+        screen.onMouseDown { mouseEvent ->
+            if (game.snake.totalPos(0).size <= 3 && game.paused == true) {
+                if (game.level1Button.isClicked(mouseEvent)) {
+                    game = initGame(screen, 1, false).addApple()
+                } else if (game.level2Button.isClicked(mouseEvent)) {
+                    game = initGame(screen, 0, false).addApple()
                 }
-                canPress = false
-                if (keyEvent.char == 'a') ateApple = true
             }
+            
+            var newDebug = if (game.debugButton.isClicked(mouseEvent) && game.snake.totalPos(0).size > 3) {
+                if (game.debug) playSound("button1") else playSound("button2")
+                !game.debug
+            } else game.debug
 
-            if(ateApple && !willCollide(game.snake,game.wall)) game = Game(game.snake.newPart(),game.wall,screen)
-            game = Game(game.snake.move(game.wall), game.wall, screen)
-            ateApple = false
-            game.run()
+            var newPaused = if (game.pauseButton.isClicked(mouseEvent) && game.snake.totalPos(0).size > 3) {
+                if (game.paused) playSound("button1") else playSound("button2")
+                !game.paused
+            } else game.paused
+
+            if (game.restartButton.isClicked(mouseEvent) && isStuck(game)) {
+                playSound("button1")
+                newPaused = true
+                game = initGame(screen, 0, true).addApple()
+            }
+            game = game.copy(debug = newDebug, paused = newPaused)
         }
 
-        screen.onTimeProgress(5000){
-            game = Game(game.snake,game.wall.newWall(game.snake),screen)
+        screen.onKeyPressed { keyEvent ->
+            game = when (keyEvent.code) {
+                UP_CODE -> if (canChangeDirection(Direction.UP, game) && !game.paused)
+                    game.copy(snake = game.snake.setDirection(Direction.UP))
+                else game
+
+                DOWN_CODE -> if (canChangeDirection(Direction.DOWN, game) && !game.paused)
+                    game.copy(snake = game.snake.setDirection(Direction.DOWN))
+                else game
+
+                LEFT_CODE -> if (canChangeDirection(Direction.LEFT, game) && !game.paused)
+                    game.copy(snake = game.snake.setDirection(Direction.LEFT))
+                else game
+
+                RIGHT_CODE -> if (canChangeDirection(Direction.RIGHT, game) && !game.paused)
+                    game.copy(snake = game.snake.setDirection(Direction.RIGHT))
+                else game
+
+                else -> game
+            }
+        }
+
+        //600000
+
+        playSound("Music1")
+        screen.onTimeProgress(101000) { playSound("Music1") }
+
+
+
+        screen.onTimeProgress(5000) {
+            if (!game.paused) {
+                game.wall.newWall(game.snake, game.apple, game.debug)
+                playSound("button1")
+            }
+        }
+
+        screen.onTimeProgress(250) {
+            if (checkApple(game)) {
+                playSound("LevelUp")
+                game = game.copy(grow = game.grow + growAmount, score = game.score + scoreAmount).addApple()
+                if (game.apple.pos in game.snake.totalPos(0)) game = game.addApple()
+            }
+            game = game.run()
+
 
         }
     }
+
 
     onFinish {
     }

@@ -27,8 +27,8 @@ data class Snake(val body: List<SnakePart>, val screen: Canvas){
     fun setDirection (direction: Direction): Snake {
         var tempBody = emptyList<SnakePart>()
         for(i in 0 until body.size){
-            if(i == 0) tempBody += SnakePart(body[i].pos, direction)
-            else tempBody += body[i]
+            tempBody += if(i == 0) SnakePart(body[i].pos, direction)
+            else body[i]
         }
         return Snake(tempBody,screen)
     }
@@ -78,9 +78,7 @@ data class Snake(val body: List<SnakePart>, val screen: Canvas){
     fun draw(){
         for(p in 0..body.indices.last){
             val sprite = getSprite(p)
-            screen.drawImage(
-                "snake|${sprite.x},${sprite.y},64,64",
-                body[p].pos.x,body[p].pos.y,CELLS.size,CELLS.size)
+            screen.drawImage("snake|${sprite.x},${sprite.y},64,64", body[p].pos,CELLS.square)
         }
     }
 
@@ -91,20 +89,28 @@ data class Snake(val body: List<SnakePart>, val screen: Canvas){
             if(i == 0) {
                 when(body[i].direction){
                     Direction.UP ->
-                        if (body[i].pos.y == 0) tempBody += SnakePart(Vector2(body[i].pos.x,CELLS.normalize.y-CELLS.size),body[i].direction)
-                        else tempBody += SnakePart(Vector2(body[i].pos.x,body[i].pos.y - CELLS.size),body[i].direction)
+                        if (body[i].pos.y == 0)
+                            tempBody += SnakePart(Vector2(body[i].pos.x,CELLS.normalize.y-CELLS.size),body[i].direction)
+                        else
+                            tempBody += SnakePart(Vector2(body[i].pos.x,body[i].pos.y - CELLS.size),body[i].direction)
 
                     Direction.DOWN ->
-                        if (body[i].pos.y == CELLS.normalize.y - CELLS.size) tempBody += SnakePart(Vector2(body[i].pos.x,0),body[i].direction)
-                        else tempBody += SnakePart(Vector2(body[i].pos.x,body[i].pos.y + CELLS.size),body[i].direction)
+                        if (body[i].pos.y == CELLS.normalize.y - CELLS.size)
+                            tempBody += SnakePart(Vector2(body[i].pos.x,0),body[i].direction)
+                        else
+                            tempBody += SnakePart(Vector2(body[i].pos.x,body[i].pos.y + CELLS.size),body[i].direction)
 
                     Direction.LEFT ->
-                        if (body[i].pos.x == 0) tempBody += SnakePart(Vector2(CELLS.normalize.x-CELLS.size,body[i].pos.y),body[i].direction)
-                        else tempBody += SnakePart(Vector2(body[i].pos.x - CELLS.size,body[i].pos.y),body[i].direction)
+                        if (body[i].pos.x == 0)
+                            tempBody += SnakePart(Vector2(CELLS.normalize.x-CELLS.size,body[i].pos.y),body[i].direction)
+                        else
+                            tempBody += SnakePart(Vector2(body[i].pos.x - CELLS.size,body[i].pos.y),body[i].direction)
 
                     Direction.RIGHT ->
-                        if (body[i].pos.x == CELLS.normalize.x-CELLS.size) tempBody += SnakePart(Vector2(0,body[i].pos.y),body[i].direction)
-                        else tempBody += SnakePart(Vector2(body[i].pos.x + CELLS.size,body[i].pos.y),body[i].direction)
+                        if (body[i].pos.x == CELLS.normalize.x-CELLS.size)
+                            tempBody += SnakePart(Vector2(0,body[i].pos.y),body[i].direction)
+                        else
+                            tempBody += SnakePart(Vector2(body[i].pos.x + CELLS.size,body[i].pos.y),body[i].direction)
                 }
             }
             else tempBody += SnakePart(Vector2(body[i-1].pos.x,body[i-1].pos.y),body[i-1].direction)
@@ -114,7 +120,7 @@ data class Snake(val body: List<SnakePart>, val screen: Canvas){
 
     fun newPart(): Snake{
         var tempBody = body
-        tempBody += body[body.lastIndex]
+        tempBody += body.last()
         return Snake(tempBody,screen)
     }
 }

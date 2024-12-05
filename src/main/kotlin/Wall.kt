@@ -1,35 +1,34 @@
 import pt.isel.canvas.*
 
-// TODO: Wall class
 data class Walls(
-    val walls: List<Vector2>,
-    val availablePlaces: List<Vector2>,
+    val walls: MutableList<Vector2>,
+    val availablePlaces: MutableList<Vector2>,
     val screen: Canvas
 ){
-
-    // TODO: Wall generation code (keep in mind that it has levels)
-    fun newWall(snake: Snake): Walls{
-        var tempWalls = walls
-        var tempAvailablePlaces = availablePlaces
-
-        while(tempAvailablePlaces.size-snake.totalPos(0).size != 0){
-            val i = availablePlaces.indices.random()
-            //screen.drawRect(tempAvailablePlaces[i].x,tempAvailablePlaces[i].y,CELLS.size,CELLS.size,GREEN,2)
-            if (availablePlaces[i] !in snake.totalPos(0)){
-                tempWalls += availablePlaces[i]
-                tempAvailablePlaces -= availablePlaces[i]
-                break
-            }
-        }
-        return Walls(tempWalls,tempAvailablePlaces,this.screen)
+    fun updateWall() {
+        for (i in walls)
+            availablePlaces -= i
     }
 
-    // TODO: Wall draw code
+
+    fun newWall(snake: Snake, apple: Apple, debug: Boolean){
+        updateWall()
+        while(availablePlaces.size-snake.totalPos(0).size-1 != 0){
+            val i = availablePlaces.indices.random()
+
+            if (availablePlaces[i] !in snake.totalPos(0) && availablePlaces[i] != apple.pos){
+                if (debug) screen.drawRect(availablePlaces[i],CELLS.square,2,GREEN)
+                walls += availablePlaces[i]
+                availablePlaces -= availablePlaces[i]
+                break
+            }
+            if (debug) screen.drawRect(availablePlaces[i],CELLS.square,2,RED)
+        }
+    }
+
     fun draw(){
         for (pos in walls) {
-            screen.drawImage(
-                "bricks|0,0,118,118",
-                pos.x,pos.y,CELLS.size,CELLS.size)
+            screen.drawImage("bricks|0,0,118,118", pos, CELLS.square)
         }
     }
 }
