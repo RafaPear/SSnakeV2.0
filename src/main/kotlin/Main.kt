@@ -7,13 +7,14 @@ const val growAmount: Int = 5
 
 fun main() {
     onStart {
+        println("Here we goo!!")
+
         //Creates the window with the specified values in CELLS.
-        val screen = CELLS.createWindow()
+        val screen = CELLS.createWindow() ; println("Created the window with $CELLS")
 
         //Draws the loading screen while the sounds load.
-        screen.drawRect(Vector2(0, 0), CELLS.normalize * 2)
-        screen.drawText(CELLS.center - Vector2(CELLS.size * 3, -CELLS.size), "Loading...", BLACK, 50)
-        loadSounds("LevelUp", "Music1", "button1", "button2")
+        drawLoadingScreen(screen)
+        loadSounds("LevelUp", "Music1", "button1", "button2") ; println("Loading Sounds")
 
         //Initializes the game with the Paused condition to allow the player to choose the desired level.
         var game: Game = initGame(screen, 0, true).addApple()
@@ -94,6 +95,6 @@ fun main() {
     }
 
     onFinish {
+        println("Oh already??... :(")
     }
-
 }

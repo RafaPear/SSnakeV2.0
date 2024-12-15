@@ -32,6 +32,11 @@ fun initGame(screen: Canvas,level: Int, paused: Boolean): Game {
     )
 }
 
+fun drawLoadingScreen(screen: Canvas){
+    screen.drawRect(Vector2(0, 0), CELLS.normalize * 2)
+    screen.drawText(CELLS.center - Vector2(CELLS.size * 3, -CELLS.size), "Loading...", BLACK, 50)
+}
+
 /**The Game data class is responsible for the game drawing and control. */
 data class Game(
     val snake: Snake,
