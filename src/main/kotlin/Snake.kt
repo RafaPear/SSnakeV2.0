@@ -14,6 +14,7 @@ data class SnakePart(val pos: Vector2, val direction: Direction)
 
 data class Snake(val body: List<SnakePart>, val screen: Canvas){
 
+    /** Returns all the snake positions from a given starting point ([start]).*/
     fun totalPos(start: Int): List<Vector2>{
         var tempList = emptyList<Vector2>()
         for(i in start..<body.size)
@@ -38,42 +39,14 @@ data class Snake(val body: List<SnakePart>, val screen: Canvas){
      * depending on the direction of the current sprite (i) in relation
      * to the previous sprite (i+1).
      */
-    private fun getSprite(i: Int): Vector2 {
-        return when(body[i].direction){
-            Direction.UP -> if (i == 0) Vector2(3,0).times(64)
-                else if (i == body.lastIndex) Vector2(3,2).times(64)
-                else if (body[i].direction == body[i+1].direction) Vector2(2,1).times(64)
-                else if (body[i+1].direction == Direction.LEFT) Vector2(0,1).times(64)
-                else if (body[i+1].direction == Direction.RIGHT) Vector2(2,2).times(64)
-                else Vector2(2,1).times(64)
-
-            Direction.DOWN -> if (i == 0) Vector2(4,1).times(64)
-                else if (i == body.lastIndex) Vector2(4,3).times(64)
-                else if (body[i].direction == body[i+1].direction) Vector2(2,1).times(64)
-                else if (body[i+1].direction == Direction.LEFT) Vector2(0,0).times(64)
-                else if (body[i+1].direction == Direction.RIGHT) Vector2(2,0).times(64)
-                else Vector2(2,1).times(64)
-
-            Direction.LEFT -> if (i == 0) Vector2(3,1).times(64)
-                else if (i == body.lastIndex) Vector2(3,3).times(64)
-                else if (body[i].direction == body[i+1].direction) Vector2(1,0).times(64)
-                else if (body[i+1].direction == Direction.UP) Vector2(2,0).times(64)
-                else if (body[i+1].direction == Direction.DOWN) Vector2(2,2).times(64)
-                else Vector2(1,0).times(64)
-
-            Direction.RIGHT -> if (i == 0) Vector2(4,0).times(64)
-                else if (i == body.lastIndex) Vector2(4,2).times(64)
-                else if (body[i].direction == body[i+1].direction) Vector2(1,0).times(64)
-                else if (body[i+1].direction == Direction.UP) Vector2(0,0).times(64)
-                else if (body[i+1].direction == Direction.DOWN) Vector2(0,1).times(64)
-                else Vector2(1,0).times(64)
-
-            else -> Vector2(1,0).times(64)
-        }
+    fun getSprite(i: Int): Vector2 {
+        return if (i == 0) getSpriteHead(body[i].direction)
+        else if (i == body.lastIndex) getSpriteTail(body[i].direction)
+        else getSpriteBody(body[i].direction,body[i+1].direction)
     }
 
     /**
-     * Draws the snake on the screen (its just that lol)
+     * Draws the snake on the screen.
      */
     fun draw(){
         for(p in 0..body.indices.last){
@@ -82,42 +55,24 @@ data class Snake(val body: List<SnakePart>, val screen: Canvas){
         }
     }
 
-    fun move (wall: Walls): Snake {
+    /** Returns the next position of the snake head.*/
+    fun getNextPosition(): Vector2{
+        return (body[0].pos + body[0].direction.offset).wrap()
+    }
+
+    /**Returns a new snake 1 cell forward, if possible.*/
+    fun move (game: Game): Snake {
+        if (willCollide(game)) return this
         var tempBody = emptyList<SnakePart>()
-        if (willCollide(this,wall)) return this
-        for(i in 0 until body.size){
-            if(i == 0) {
-                when(body[i].direction){
-                    Direction.UP ->
-                        if (body[i].pos.y == 0)
-                            tempBody += SnakePart(Vector2(body[i].pos.x,CELLS.normalize.y-CELLS.size),body[i].direction)
-                        else
-                            tempBody += SnakePart(Vector2(body[i].pos.x,body[i].pos.y - CELLS.size),body[i].direction)
-
-                    Direction.DOWN ->
-                        if (body[i].pos.y == CELLS.normalize.y - CELLS.size)
-                            tempBody += SnakePart(Vector2(body[i].pos.x,0),body[i].direction)
-                        else
-                            tempBody += SnakePart(Vector2(body[i].pos.x,body[i].pos.y + CELLS.size),body[i].direction)
-
-                    Direction.LEFT ->
-                        if (body[i].pos.x == 0)
-                            tempBody += SnakePart(Vector2(CELLS.normalize.x-CELLS.size,body[i].pos.y),body[i].direction)
-                        else
-                            tempBody += SnakePart(Vector2(body[i].pos.x - CELLS.size,body[i].pos.y),body[i].direction)
-
-                    Direction.RIGHT ->
-                        if (body[i].pos.x == CELLS.normalize.x-CELLS.size)
-                            tempBody += SnakePart(Vector2(0,body[i].pos.y),body[i].direction)
-                        else
-                            tempBody += SnakePart(Vector2(body[i].pos.x + CELLS.size,body[i].pos.y),body[i].direction)
-                }
-            }
-            else tempBody += SnakePart(Vector2(body[i-1].pos.x,body[i-1].pos.y),body[i-1].direction)
+        for(i in 0 until body.size) {
+            tempBody += if (i == 0) {
+                SnakePart(getNextPosition(), body[i].direction)
+            } else SnakePart(Vector2(body[i - 1].pos.x, body[i - 1].pos.y), body[i - 1].direction)
         }
         return Snake(tempBody,screen)
     }
 
+    /** Returns a new snake with the last body part duplicated.*/
     fun newPart(): Snake{
         var tempBody = body
         tempBody += body.last()

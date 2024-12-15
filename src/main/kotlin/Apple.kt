@@ -1,23 +1,31 @@
 import pt.isel.canvas.*
 
+/**
+ * The Apple data class calculates the position [Vector2] for every new apple
+ * that needs to be generated. To generate an apple use the function [newApple]
+ * and do draw it use the function [draw].
+ */
+
 data class Apple(
     val pos: Vector2? = null,
     val screen: Canvas
 ){
-    fun newApple(snake: Snake, walls: Walls): Apple {
+    /**Generates a new apple on an available cell.*/
+    fun newApple(game: Game): Apple {
         var tempPos = pos
-        while(walls.availablePlaces.size-snake.totalPos(0).size != 0){
-            val i = walls.availablePlaces.indices.random()
+        while(game.walls.availablePlaces.size-game.snake.totalPos(0).size != 0){
+            val i = game.walls.availablePlaces.indices.random()
 
-            if (walls.availablePlaces[i] !in snake.totalPos(0) &&
-                walls.availablePlaces[i] != snake.move(walls).body[0].pos){
-                tempPos = walls.availablePlaces[i]
+            if (game.walls.availablePlaces[i] !in occupiedCells(game) &&
+                game.walls.availablePlaces[i] !== game.snake.getNextPosition()){
+                tempPos = game.walls.availablePlaces[i]
                 break
             }
         }
         return Apple(tempPos, screen)
     }
 
+    /**Draws the apple on the screen.*/
     fun draw(){
         if (pos != null) {
             screen.drawImage("snake|0,192,64,64", pos, CELLS.square)
