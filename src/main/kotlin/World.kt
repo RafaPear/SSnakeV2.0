@@ -22,7 +22,7 @@ data class Vector2(var x: Int, var y: Int) {
     operator fun rem(a: Int) = Vector2(x % a, y % a)
     operator fun rem(a: Vector2) = Vector2(x % a.x, y % a.y)
 
-    /** Wraps the vector values to the screen bounds.*/
+    /** Wraps the vector values to the screen bounds. Thanks to Artur Nogueira, Group 12 for the idea.*/
     fun wrap(): Vector2 = (this + CELLS.normalize) % CELLS.normalize
 }
 

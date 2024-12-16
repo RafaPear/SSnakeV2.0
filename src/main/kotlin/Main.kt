@@ -19,37 +19,9 @@ fun main() {
         //Initializes the game with the Paused condition to allow the player to choose the desired level.
         var game: Game = initGame(screen, 0, true).addApple()
 
-        //Mouse left click handler for the buttons.
-        screen.onMouseDown { mouseEvent ->
-            if (game.snake.totalPos(0).size <= 3 && game.paused == true) {
-                if (game.level1Button.isClicked(mouseEvent)) {
-                    game = initGame(screen, 1, false).addApple()
-                } else if (game.level2Button.isClicked(mouseEvent)) {
-                    game = initGame(screen, 0, false).addApple()
-                }
-            }
-            //Checks if the Debug Button was pressed (if the mouse click was inside the button borders).
-            game = game.copy(
-                debug = if (game.debugButton.isClicked(mouseEvent) && game.snake.totalPos(0).size > 3) {
-                    if (game.debug) playSound("button1") else playSound("button2")
-                    !game.debug
-                } else game.debug
-            )
-
-            //Checks if the Pause Button was pressed (if the mouse click was inside the button borders).
-            game = game.copy(
-                paused = if (game.pauseButton.isClicked(mouseEvent) && game.snake.totalPos(0).size > 3) {
-                    if (game.paused) playSound("button1") else playSound("button2")
-                    !game.paused
-            } else game.paused
-            )
-
-            //Checks if the Restart Button was pressed (Only works if the player is stuck).
-            if (game.restartButton.isClicked(mouseEvent) && isStuck(game)) {
-                playSound("button1")
-                game = initGame(screen, 0, true).addApple()
-            }
-        }
+        //Plays the song on start and then loops it every 1.68 minutes.
+        playSound("Music1")
+        screen.onTimeProgress(101000) { playSound("Music1") }
 
         //Keyboard Key handler for the snake movement.
         // For the key pressed it checks if the snake can change to the desired direction
@@ -76,9 +48,37 @@ fun main() {
             }
         }
 
-        //Plays the song on start and then loops it every 1.68 minutes.
-        playSound("Music1")
-        screen.onTimeProgress(101000) { playSound("Music1") }
+        //Mouse left click handler for the buttons.
+        screen.onMouseDown { mouseEvent ->
+            if (game.snake.totalPos(0).size <= 3 && game.paused) {
+                if (game.level1Button.isClicked(mouseEvent)) {
+                    game = initGame(screen, 1, false).addApple()
+                } else if (game.level2Button.isClicked(mouseEvent)) {
+                    game = initGame(screen, 0, false).addApple()
+                }
+            }
+            //Checks if the Debug Button was pressed (if the mouse click was inside the button borders).
+            game = game.copy(
+                debug = if (game.debugButton.isClicked(mouseEvent) && game.snake.totalPos(0).size > 3) {
+                    if (game.debug) playSound("button1") else playSound("button2")
+                    !game.debug
+                } else game.debug
+            )
+
+            //Checks if the Pause Button was pressed (if the mouse click was inside the button borders).
+            game = game.copy(
+                paused = if (game.pauseButton.isClicked(mouseEvent) && game.snake.totalPos(0).size > 3) {
+                    if (game.paused) playSound("button1") else playSound("button2")
+                    !game.paused
+                } else game.paused
+            )
+
+            //Checks if the Restart Button was pressed (Only works if the player is stuck).
+            if (game.restartButton.isClicked(mouseEvent) && isStuck(game)) {
+                playSound("button1")
+                game = initGame(screen, 0, true).addApple()
+            }
+        }
 
         //Creates a new wall every 5 seconds (if the game is NOT paused) and plays a sound.
         screen.onTimeProgress(5000) {
@@ -90,6 +90,9 @@ fun main() {
 
         //Main game run loop every 250 milliseconds or
         screen.onTimeProgress(250) {
+            if (!game.paused) {
+                game = game.grow()
+            }
             game = game.run()
         }
     }

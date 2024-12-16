@@ -1,5 +1,4 @@
 import pt.isel.canvas.*
-
 const val GREY = 0x848484
 
 /**Draws a Rectangle on the given [pos], [size]

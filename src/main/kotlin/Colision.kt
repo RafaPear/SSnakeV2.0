@@ -1,6 +1,10 @@
 
 /**Returns a list of type [Vector2] with the positions occupied by the snake and the walls.*/
-fun occupiedCells(game: Game) = game.snake.totalPos(1) + game.walls.filledPlaces
+fun occupiedCells(game: Game) =
+    if(game.grow > 0)
+        game.snake.totalPos(1) + game.walls.filledPlaces
+    else game.snake.totalPos(1) - game.snake.totalPos(1).last() + game.walls.filledPlaces
+
 
 /**Tests if the next position of the snake head is a wall or her body. If the snake isn't growing
  * it ignores the tail.*/
@@ -13,7 +17,7 @@ fun willCollide(game: Game): Boolean {
  * Returns false if the snake new direction will collide. */
 fun canChangeDirection(newDirection: Direction, game: Game): Boolean {
     val tempGame = game.copy(snake = game.snake.move(game))
-    return ((game.snake.body[0].pos + newDirection.offset).wrap() !in occupiedCells(tempGame)) ||
+    return ((game.snake.body[0].pos + newDirection.offset).wrap() !in occupiedCells(game)) ||
             ((game.snake.body[0].pos + newDirection.offset).wrap() == game.snake.totalPos(1).last() && game.grow == 0)
 }
 

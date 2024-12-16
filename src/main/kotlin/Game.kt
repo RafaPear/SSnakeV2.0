@@ -93,7 +93,6 @@ data class Game(
             }
             if (apple.pos in snake.totalPos(0)) newGame = newGame.addApple()
             draw(newGame)
-            newGame = newGame.grow()
             if (debug) newGame.drawDebug()
             newGame.drawUI()
             return newGame
@@ -118,7 +117,7 @@ data class Game(
 
     /**Draws the level selector screen*/
     fun drawLevelSelect(){
-        screen.drawRect(Vector2(0, 0), CELLS.normalize * 2, 0, GREY)
+        screen.drawRect(Vector2(0, 0), CELLS.normalize * 2, 0, BLACK)
         screen.drawText(
             CELLS.center - Vector2(CELLS.size * 8, CELLS.size * 4),
             "SSnake: Select Level",
