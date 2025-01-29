@@ -3,20 +3,24 @@
 ## Description
 SSnakeV2.0 is a Snake game developed in Kotlin using a custom graphics library provided by the university. The game keeps the classic Snake mechanics but improves visuals and performance with the integration of the university's library, creating a more engaging and fun experience for the player.
 
-# Snake Game Screenshots
-
-### Screenshot 1
-![Captura 1](images/Captura%20de%20ecrã%202025-01-29%20133657.png)
-
-### Screenshot 2
-![Captura 2](images/Captura%20de%20ecrã%202025-01-29%20133717.png)
-
-### Screenshot 3
-![Captura 3](images/Captura%20de%20ecrã%202025-01-29%20133737.png)
-
-### Screenshot 4
-![Captura 4](images/Captura%20de%20ecrã%202025-01-29%20133747.png)
-
+<p align="center">
+  <picture>
+    <source srcset="images/Captura%20de%20ecrã%202025-01-29%20133657.png" media="(min-width: 500px)">
+    <img src="images/Captura%20de%20ecrã%202025-01-29%20133657.png" width="400"/>
+  </picture>
+  <picture>
+    <source srcset="images/Captura%20de%20ecrã%202025-01-29%20133717.png" media="(min-width: 500px)">
+    <img src="images/Captura%20de%20ecrã%202025-01-29%20133717.png" width="400"/>
+  </picture>
+  <picture>
+    <source srcset="images/Captura%20de%20ecrã%202025-01-29%20133737.png" media="(min-width: 500px)">
+    <img src="images/Captura%20de%20ecrã%202025-01-29%20133737.png" width="400"/>
+  </picture>
+  <picture>
+    <source srcset="images/Captura%20de%20ecrã%202025-01-29%20133747.png" media="(min-width: 500px)">
+    <img src="images/Captura%20de%20ecrã%202025-01-29%20133747.png" width="400"/>
+  </picture>
+</p>
 
 ## Features
 - **Classic Snake Gameplay:** Navigate the snake to eat food, grow in size, and avoid hitting walls or itself.
